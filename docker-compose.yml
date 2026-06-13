@@ -1,0 +1,47 @@
+services:
+  api:
+    build: .
+    command: ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8010:8000"
+    volumes:
+      - ./models:/app/models
+    environment:
+      - YOLO_CONFIG_DIR=/tmp/ultralytics
+      - PYTHONWARNINGS=ignore
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build: .
+    command:
+      [
+        "streamlit", "run", "app/main.py",
+        "--server.port=8501",
+        "--server.address=0.0.0.0",
+        "--server.headless=true",
+        "--server.fileWatcherType=none",
+      ]
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000
+      - API_DOCS_URL=http://localhost:8010
+      - STREAMLIT_THEME_BASE=dark
+      - STREAMLIT_LOG_LEVEL=error
+    depends_on:
+      api:
+        condition: service_healthy
+
+  train:
+    build: .
+    command: ["python", "train.py"]
+    volumes:
+      - ./models:/app/models
+    environment:
+      - YOLO_CONFIG_DIR=/tmp/ultralytics
+    profiles:
+      - train

@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+output/
+models/
+runs/
+*.pt
+node_modules/
+package.json
+package-lock.json
+gen_memoria.js
+resumen.txt
