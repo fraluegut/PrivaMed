@@ -7,19 +7,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir -r requirements.txt
 
 COPY api/ ./api/
 COPY app/ ./app/
-COPY train.py .
 COPY data.yaml .
-COPY images/ ./images/
-COPY labels/ ./labels/
-
-RUN find /app/labels -name "*.cache" -delete 2>/dev/null; \
-    echo "=== Images train ===" && ls /app/images/train/ | head -3 && \
-    echo "=== Labels train ===" && ls /app/labels/train/ | head -3 && \
-    echo "=== Image count ===" && ls /app/images/train/ | wc -l && \
-    echo "=== Label count ===" && ls /app/labels/train/ | wc -l
 
 EXPOSE 8000 8501
