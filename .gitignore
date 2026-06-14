@@ -4,6 +4,7 @@ __pycache__/
 output/
 runs/
 node_modules/
+.claude/
 package.json
 package-lock.json
 gen_memoria.js
